@@ -136,6 +136,17 @@ describe('validateToken', () => {
     expect(isTokenValid).rejects.toThrow(Error)
   })
 
+  test('can skip timestamp validation', async () => {
+    const sk = generateSecretKey()
+    const invalidToken = await getToken('http://test.com', 'get', e => {
+      e.created_at = 0
+      return finalizeEvent(e, sk)
+    })
+    const isTokenValid = await validateToken(invalidToken, 'http://test.com', 'get', { skipTimestampValidation: true })
+
+    expect(isTokenValid).toBe(true)
+  })
+
   test('throws an error for invalid url', async () => {
     const sk = generateSecretKey()
     const token = await getToken('http://test.com', 'get', e => finalizeEvent(e, sk))

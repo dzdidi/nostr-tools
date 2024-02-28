@@ -48,12 +48,12 @@ export async function getToken(
  * @example
  * await nip98.validateToken('Nostr base64token', 'https://example.com/login', 'post')
  */
-export async function validateToken(token: string, url: string, method: string): Promise<boolean> {
+export async function validateToken(token: string, url: string, method: string, opts = { skipTimestampValidation: false }): Promise<boolean> {
   const event = await unpackEventFromToken(token).catch(error => {
     throw error
   })
 
-  const valid = await validateEvent(event, url, method).catch(error => {
+  const valid = await validateEvent(event, url, method, null, opts).catch(error => {
     throw error
   })
 
@@ -172,10 +172,11 @@ export function validateEventPayloadTag(event: Event, payload: any): boolean {
  * @param url - The URL associated with the event.
  * @param method - The HTTP method associated with the event.
  * @param body - The request body associated with the event (optional).
+ * @param opts - options for the validation.
  * @returns A promise that resolves to a boolean indicating whether the event is valid.
  * @throws An error if the event is invalid.
  */
-export async function validateEvent(event: Event, url: string, method: string, body?: any): Promise<boolean> {
+export async function validateEvent(event: Event, url: string, method: string, body?: any, opts = { skipTimestampValidation: false }): Promise<boolean> {
   if (!verifyEvent(event)) {
     throw new Error('Invalid nostr event, signature invalid')
   }
@@ -184,8 +185,10 @@ export async function validateEvent(event: Event, url: string, method: string, b
     throw new Error('Invalid nostr event, kind invalid')
   }
 
-  if (!validateEventTimestamp(event)) {
-    throw new Error('Invalid nostr event, created_at timestamp invalid')
+  if (!opts.skipTimestampValidation) {
+    if (!validateEventTimestamp(event)) {
+      throw new Error('Invalid nostr event, created_at timestamp invalid')
+    }
   }
 
   if (!validateEventUrlTag(event, url)) {
