@@ -1,11 +1,11 @@
 {
   "type": "module",
-  "name": "nostr-tools",
+  "name": "@dzdidi_restored/nostr-tools",
   "version": "2.3.1",
   "description": "Tools for making a Nostr client.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nbd-wtf/nostr-tools.git"
+    "url": "https://github.com/dzdidi/nostr-tools.git"
   },
   "files": [
     "lib"
